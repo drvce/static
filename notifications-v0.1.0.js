@@ -33,77 +33,83 @@ window.ntf = (function() {
         notification.id = `notification-${id}`
         notification.className = 'wfx-notification'
         
-        // Tailwind-inspired base styles
+        // Notification card base styles
         Object.assign(notification.style, {
-            padding: '16px 20px',
-            borderRadius: '8px',
-            border: '1px solid #e5e7eb', // gray-200
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', // shadow-lg
-            fontSize: '14px',
-            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
-            fontWeight: '400',
-            lineHeight: '1.5',
+            padding: '20px 24px',
+            borderRadius: '24px',
+            border: 'none',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
+            fontSize: '15px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            fontWeight: '500',
+            lineHeight: '1.4',
             wordWrap: 'break-word',
             opacity: '0',
-            transform: 'translateY(-10px)',
-            transition: `all ${NOTIFICATION_FADE_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+            transform: 'translateY(-10px) scale(0.95)',
+            transition: `all ${NOTIFICATION_FADE_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
             cursor: 'pointer',
             pointerEvents: 'auto',
             position: 'relative',
             overflow: 'hidden',
-            backdropFilter: 'blur(8px)',
-            minHeight: '44px',
+            minHeight: '64px',
             display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
+            alignItems: 'flex-start',
+            gap: '16px',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)'
         })
         
-        // Tailwind-inspired type-specific styling
+        // Card-style type-specific colors
         const typeStyles = {
             default: { 
                 backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                color: '#374151', // gray-700
-                borderColor: '#d1d5db', // gray-300
-                borderLeftWidth: '4px',
-                borderLeftColor: '#6b7280' // gray-500
+                color: '#1f2937'
             },
             success: { 
-                backgroundColor: 'rgba(240, 253, 244, 0.95)', // green-50 with opacity
-                color: '#065f46', // green-800
-                borderColor: '#a7f3d0', // green-200
-                borderLeftWidth: '4px',
-                borderLeftColor: '#10b981' // green-500
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                color: '#059669'
             },
             error: { 
-                backgroundColor: 'rgba(254, 242, 242, 0.95)', // red-50 with opacity
-                color: '#991b1b', // red-800
-                borderColor: '#fecaca', // red-200
-                borderLeftWidth: '4px',
-                borderLeftColor: '#ef4444' // red-500
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                color: '#dc2626'
             },
             warning: { 
-                backgroundColor: 'rgba(255, 251, 235, 0.95)', // amber-50 with opacity
-                color: '#92400e', // amber-800
-                borderColor: '#fde68a', // amber-200
-                borderLeftWidth: '4px',
-                borderLeftColor: '#f59e0b' // amber-500
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                color: '#d97706'
             },
             info: { 
-                backgroundColor: 'rgba(239, 246, 255, 0.95)', // blue-50 with opacity
-                color: '#1e40af', // blue-800
-                borderColor: '#bfdbfe', // blue-200
-                borderLeftWidth: '4px',
-                borderLeftColor: '#3b82f6' // blue-500
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                color: '#2563eb'
             }
         }
         
         Object.assign(notification.style, typeStyles[type] || typeStyles.default)
         
-        // Create icon based on type
-        const icon = document.createElement('span')
-        icon.style.flexShrink = '0'
-        icon.style.fontSize = '16px'
-        icon.style.lineHeight = '1'
+        // Create icon container with circular background
+        const iconContainer = document.createElement('div')
+        Object.assign(iconContainer.style, {
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: '0',
+            fontSize: '18px',
+            fontWeight: '600',
+            marginTop: '2px'
+        })
+        
+        // Icon background colors based on type
+        const iconBackgrounds = {
+            default: { backgroundColor: '#f3f4f6', color: '#6b7280' },
+            success: { backgroundColor: '#dcfce7', color: '#16a34a' },
+            error: { backgroundColor: '#fee2e2', color: '#dc2626' },
+            warning: { backgroundColor: '#fef3c7', color: '#d97706' },
+            info: { backgroundColor: '#dbeafe', color: '#2563eb' }
+        }
+        
+        Object.assign(iconContainer.style, iconBackgrounds[type] || iconBackgrounds.default)
         
         const icons = {
             default: 'ℹ️',
@@ -112,7 +118,7 @@ window.ntf = (function() {
             warning: '⚠️',
             info: 'ℹ️'
         }
-        icon.textContent = icons[type] || icons.default
+        iconContainer.textContent = icons[type] || icons.default
         
         // Create message container
         const messageContainer = document.createElement('span')
@@ -121,29 +127,37 @@ window.ntf = (function() {
         
         // Create close button
         const closeBtn = document.createElement('button')
-        closeBtn.innerHTML = '✕'
+        closeBtn.innerHTML = '×'
         Object.assign(closeBtn.style, {
             background: 'none',
             border: 'none',
-            fontSize: '14px',
-            fontWeight: '600',
+            fontSize: '20px',
+            fontWeight: '300',
             cursor: 'pointer',
-            opacity: '0.5',
+            opacity: '0.4',
             lineHeight: '1',
-            padding: '4px',
-            borderRadius: '4px',
-            color: 'inherit',
+            padding: '8px',
+            borderRadius: '50%',
+            color: '#6b7280',
             flexShrink: '0',
-            transition: 'opacity 150ms ease-in-out'
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 150ms ease-in-out',
+            position: 'absolute',
+            top: '16px',
+            right: '16px'
         })
         
         closeBtn.addEventListener('mouseenter', () => {
-            closeBtn.style.opacity = '1'
-            closeBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'
+            closeBtn.style.opacity = '0.8'
+            closeBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.08)'
         })
         
         closeBtn.addEventListener('mouseleave', () => {
-            closeBtn.style.opacity = '0.5'
+            closeBtn.style.opacity = '0.4'
             closeBtn.style.backgroundColor = 'transparent'
         })
         
@@ -158,16 +172,17 @@ window.ntf = (function() {
             position: 'absolute',
             bottom: '0',
             left: '0',
-            height: '2px',
-            backgroundColor: notification.style.borderLeftColor || '#6b7280',
+            height: '3px',
+            backgroundColor: notification.style.color || '#6b7280',
             width: '100%',
             transformOrigin: 'left',
             transform: 'scaleX(1)',
-            opacity: '0.6'
+            opacity: '0.3',
+            borderRadius: '0 0 24px 24px'
         })
         
         // Assemble notification
-        notification.appendChild(icon)
+        notification.appendChild(iconContainer)
         notification.appendChild(messageContainer)
         notification.appendChild(closeBtn)
         notification.appendChild(progressBar)
@@ -181,13 +196,13 @@ window.ntf = (function() {
         
         // Hover effects
         notification.addEventListener('mouseenter', () => {
-            notification.style.transform = 'translateY(-2px)'
-            notification.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' // shadow-xl
+            notification.style.transform = 'translateY(-4px) scale(1.02)'
+            notification.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)'
         })
         
         notification.addEventListener('mouseleave', () => {
-            notification.style.transform = 'translateY(0)'
-            notification.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' // shadow-lg
+            notification.style.transform = 'translateY(0) scale(1)'
+            notification.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
         })
         
         return { element: notification, progressBar }
@@ -206,7 +221,7 @@ window.ntf = (function() {
         // Trigger slide-in animation
         requestAnimationFrame(() => {
             element.style.opacity = '1'
-            element.style.transform = 'translateY(0)'
+            element.style.transform = 'translateY(0) scale(1)'
         })
         
         // Store notification data
@@ -249,7 +264,7 @@ window.ntf = (function() {
         
         // Animate out
         notification.element.style.opacity = '0'
-        notification.element.style.transform = 'translateY(-10px)'
+        notification.element.style.transform = 'translateY(-10px) scale(0.95)'
         
         // Remove from arrays
         visibleNotifications.splice(notificationIndex, 1)
