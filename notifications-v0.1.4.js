@@ -112,8 +112,8 @@ window.ntf = (function() {
             justifyContent: 'center',
             transition: 'all 150ms ease-in-out',
             position: 'absolute',
-            top: '16px',
-            right: '16px'
+            top: '10px',
+            right: '10px'
         })
         
         closeBtn.addEventListener('mouseenter', () => {
