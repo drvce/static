@@ -54,7 +54,7 @@ window.ntf = (function() {
             minHeight: '64px',
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '16px',
+            paddingRight: '60px', // Make room for close button
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)'
         })
@@ -85,44 +85,10 @@ window.ntf = (function() {
         
         Object.assign(notification.style, typeStyles[type] || typeStyles.default)
         
-        // Create icon container with circular background
-        const iconContainer = document.createElement('div')
-        Object.assign(iconContainer.style, {
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: '0',
-            fontSize: '18px',
-            fontWeight: '600',
-            marginTop: '2px'
-        })
-        
-        // Icon background colors based on type
-        const iconBackgrounds = {
-            default: { backgroundColor: '#f3f4f6', color: '#6b7280' },
-            success: { backgroundColor: '#dcfce7', color: '#16a34a' },
-            error: { backgroundColor: '#fee2e2', color: '#dc2626' },
-            warning: { backgroundColor: '#fef3c7', color: '#d97706' },
-            info: { backgroundColor: '#dbeafe', color: '#2563eb' }
-        }
-        
-        Object.assign(iconContainer.style, iconBackgrounds[type] || iconBackgrounds.default)
-        
-        const icons = {
-            default: 'ℹ️',
-            success: '✅',
-            error: '❌',
-            warning: '⚠️',
-            info: 'ℹ️'
-        }
-        iconContainer.textContent = icons[type] || icons.default
-        
         // Create message container
-        const messageContainer = document.createElement('span')
+        const messageContainer = document.createElement('div')
         messageContainer.style.flex = '1'
+        messageContainer.style.paddingTop = '2px'
         messageContainer.textContent = message
         
         // Create close button
@@ -182,7 +148,6 @@ window.ntf = (function() {
         })
         
         // Assemble notification
-        notification.appendChild(iconContainer)
         notification.appendChild(messageContainer)
         notification.appendChild(closeBtn)
         notification.appendChild(progressBar)
@@ -192,17 +157,6 @@ window.ntf = (function() {
             if (e.target !== closeBtn) {
                 dismissNotification(id)
             }
-        })
-        
-        // Hover effects
-        notification.addEventListener('mouseenter', () => {
-            notification.style.transform = 'translateY(-4px) scale(1.02)'
-            notification.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1)'
-        })
-        
-        notification.addEventListener('mouseleave', () => {
-            notification.style.transform = 'translateY(0) scale(1)'
-            notification.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)'
         })
         
         return { element: notification, progressBar }
