@@ -35,7 +35,7 @@ window.ntf = (function() {
         
         // Notification card base styles
         Object.assign(notification.style, {
-            padding: '20px 24px',
+            padding: '16px',
             borderRadius: '24px',
             border: 'none',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)',
