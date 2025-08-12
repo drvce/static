@@ -51,7 +51,6 @@ window.ntf = (function() {
             pointerEvents: 'auto',
             position: 'relative',
             overflow: 'hidden',
-            minHeight: '64px',
             display: 'flex',
             alignItems: 'flex-start',
             paddingRight: '60px', // Make room for close button
