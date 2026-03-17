@@ -260,14 +260,14 @@
         function mount(parent) {
             var _a, _b, _c, _d;
             if (!isBrowserReady()) {
-                throw new Error("SonnerVanilla can only run in a browser.");
+                throw new Error("SONNER can only run in a browser.");
             }
             if (defaults.injectStyles) {
                 ensureStyles();
             }
             const target = (_a = parent !== null && parent !== void 0 ? parent : defaults.container) !== null && _a !== void 0 ? _a : document.body;
             if (!target) {
-                throw new Error("SonnerVanilla could not find a mount target.");
+                throw new Error("SONNER could not find a mount target.");
             }
             mountedParent = target;
             if (!root) {
@@ -441,6 +441,7 @@
             });
         }
         function showWithType(type, title, options) {
+            ensureMounted();
             const record = createToastRecord(title, type, options);
             return upsertToast(record);
         }
@@ -538,8 +539,7 @@
     }
     const defaultToaster = createToaster();
     const toast = createToastApi(defaultToaster);
-    window.SonnerVanilla = {
-        createToaster,
-        toast,
-    };
+    const SONNER = toast;
+    SONNER.createToaster = createToaster;
+    window.SONNER = SONNER;
 })();
