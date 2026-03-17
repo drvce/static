@@ -1,7 +1,7 @@
 "use strict";
 (() => {
     const DEFAULT_DURATION = 4000;
-    const DEFAULT_POSITION = "bottom-right";
+    const DEFAULT_POSITION = "top-center";
     const DEFAULT_MAX_VISIBLE = 3;
     const DEFAULT_GAP = 12;
     const DEFAULT_OFFSET = 24;
@@ -15,7 +15,6 @@
   z-index: 999999;
   display: flex;
   flex-direction: column;
-  gap: var(--sonner-gap, 12px);
   width: min(360px, calc(100vw - 32px));
   box-sizing: border-box;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -44,6 +43,31 @@
 
 [data-sonner-vanilla-root][data-position^="bottom-"] {
   flex-direction: column-reverse;
+}
+
+[data-sonner-vanilla-item] {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows ${EXIT_ANIMATION_MS}ms cubic-bezier(0.4, 0, 1, 1),
+    margin ${EXIT_ANIMATION_MS}ms cubic-bezier(0.4, 0, 1, 1),
+    opacity ${EXIT_ANIMATION_MS}ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+[data-sonner-vanilla-item] + [data-sonner-vanilla-item] {
+  margin-top: var(--sonner-gap, 12px);
+}
+
+[data-sonner-vanilla-item-body] {
+  min-height: 0;
+  overflow: hidden;
+}
+
+[data-sonner-vanilla-item][data-state="closing"] {
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  opacity: 0;
 }
 
 [data-sonner-vanilla-toast] {
@@ -203,6 +227,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [data-sonner-vanilla-item] {
+    transition: none;
+  }
+
   [data-sonner-vanilla-toast] {
     animation: none;
     opacity: 1;
@@ -380,6 +408,7 @@
             (_d = (_c = handle.toast).onDismiss) === null || _d === void 0 ? void 0 : _d.call(_c, handle.toast);
         }
         function removeHandle(handle, reason) {
+            var _a;
             if (handle.isClosing) {
                 return;
             }
@@ -387,6 +416,7 @@
             clearExitTimer(handle);
             handle.isClosing = true;
             handle.element.dataset.state = "closing";
+            (_a = handle.element.querySelector("[data-sonner-vanilla-toast]")) === null || _a === void 0 ? void 0 : _a.setAttribute("data-state", "closing");
             handle.exitTimerId = window.setTimeout(() => {
                 finalizeRemoveHandle(handle, reason);
                 trimVisible();
@@ -418,11 +448,15 @@
         function createToastElement(handle) {
             var _a;
             const toast = handle.toast;
+            const item = document.createElement("div");
+            item.dataset.sonnerVanillaItem = "";
             const element = document.createElement("div");
-            element.dataset.sonnerVanillaToast = "";
-            element.dataset.type = toast.type;
+            element.dataset.sonnerVanillaItemBody = "";
+            const surface = document.createElement("div");
+            surface.dataset.sonnerVanillaToast = "";
+            surface.dataset.type = toast.type;
             if (toast.className) {
-                element.className = toast.className;
+                surface.className = toast.className;
             }
             const icon = createIcon(toast.type);
             const content = document.createElement("div");
@@ -466,14 +500,16 @@
                 close.addEventListener("click", () => instance.dismiss(toast.id));
                 actions.appendChild(close);
             }
-            element.appendChild(icon);
-            element.appendChild(content);
-            element.appendChild(actions);
+            surface.appendChild(icon);
+            surface.appendChild(content);
+            surface.appendChild(actions);
+            element.appendChild(surface);
+            item.appendChild(element);
             if (canClose) {
-                element.addEventListener("mouseenter", () => pauseTimer(handle));
-                element.addEventListener("mouseleave", () => startTimer(handle));
+                item.addEventListener("mouseenter", () => pauseTimer(handle));
+                item.addEventListener("mouseleave", () => startTimer(handle));
             }
-            return element;
+            return item;
         }
         function upsertToast(record) {
             var _a, _b, _c, _d;
